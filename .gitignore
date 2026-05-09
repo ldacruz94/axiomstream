@@ -4,7 +4,7 @@ out/
 !**/src/test/**/out/
 .kotlin
 .idea/
-./target
+target/
 
 ### Eclipse ###
 .apt_generated
