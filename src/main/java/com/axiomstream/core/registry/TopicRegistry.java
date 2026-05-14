@@ -1,11 +1,13 @@
 package com.axiomstream.core.registry;
 
 import com.axiomstream.core.model.Topic;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Component
 public class TopicRegistry {
 
     private final HashMap<String, Topic> topicStore = new HashMap<>();

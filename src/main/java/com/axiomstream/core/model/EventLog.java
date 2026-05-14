@@ -23,7 +23,7 @@ public class EventLog {
     private long nextOffset;
     private long maxSegmentSizeBytes;
 
-    public EventRecord append(String key, String payload) throws IOException {
+    public synchronized EventRecord append(String key, String payload) throws IOException {
         Files.createDirectories(logDirectory);
 
         EventRecord eventRecord = new EventRecord(

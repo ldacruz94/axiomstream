@@ -4,12 +4,15 @@ import com.axiomstream.core.exceptions.PartitionCountIsZeroException;
 import com.axiomstream.core.exceptions.TopicAlreadyExistsException;
 import com.axiomstream.core.model.*;
 import com.axiomstream.core.registry.TopicRegistry;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+@Service
 public class TopicService implements ITopicService {
 
     private final TopicRegistry topicRegistry;
@@ -19,19 +22,25 @@ public class TopicService implements ITopicService {
         this.topicRegistry = topicRegistry;
     }
 
-    public void createTopic(String name, int partitionCount) {
-
-        if (partitionCount == 0) {
-            throw new PartitionCountIsZeroException("Partition count needs to be greater than 0");
+    public Topic createTopic(String name, int partitionCount) {
+        if (partitionCount <= 0) {
+            throw new PartitionCountIsZeroException(
+                    "Partition count needs to be greater than 0"
+            );
         }
 
         if (topicRegistry.getTopic(name) != null) {
-            throw new TopicAlreadyExistsException("Topic name already exists: " + name);
+            throw new TopicAlreadyExistsException(
+                    "Topic name already exists: " + name
+            );
         }
 
         List<Partition> partitions = new ArrayList<>();
+
         for (int i = 0; i < partitionCount; i++) {
-            Partition partition = new Partition(i, name,
+            Partition partition = new Partition(
+                    i,
+                    name,
                     new EventLog(
                             name,
                             i,
@@ -48,10 +57,18 @@ public class TopicService implements ITopicService {
 
         Topic topic = new Topic(name, partitionCount, partitions, Instant.now());
         topicRegistry.createTopic(topic);
+
+        return topic;
     }
 
     public Topic getTopic(String name) {
-        return topicRegistry.getTopic(name);
+        Topic topic = topicRegistry.getTopic(name);
+
+        if (topic == null) {
+            throw new NoSuchElementException("Topic does not exist: " + name);
+        }
+
+        return topic;
     }
 
     public List<Topic> listTopics() {
